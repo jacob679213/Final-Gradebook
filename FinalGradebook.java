@@ -369,22 +369,27 @@ public class FinalGradebook {
     }
     
     public static void save(ArrayList<Student> s){
-        for(int i = 0; i > s.size(); i++){
+        for(int i = 0; i < s.size(); i++){
             //looks for file. If there isn't one, it should create it.
-            File file = new File("H:/Files-to-read/Gradebook-Students/"+s.get(i).getName()+".txt");
+            File file = new File("H:/Files-to-read/Gradebook-Students/"+s.get(i).getName().replace(" ", "-")+".txt");
+            
+            int AAAAAAA = 0;
             
             //try and save
             try{
                 //if a new file is created
-                if(file.createNewFile()){
-                    //create a writer
+                if(!file.exists()){
+                    //creates file
+                    file.createNewFile();
+                }
+                //create a writer
                     FileWriter writer = new FileWriter(file);
                     //write the students name
                     writer.write(s.get(i).getName());
                     //new line
                     writer.write(System.lineSeparator());
                     //write tons of grades
-                    for(int e = 0; e > s.get(i).getCount(); e++){
+                    for(int e = 0; e < s.get(i).getCount(); e++){
                         //write name
                         writer.write(s.get(i).getAssignmentToSave(e).getName());
                         writer.write(System.lineSeparator());
@@ -394,12 +399,6 @@ public class FinalGradebook {
                     }
                     //stop
                     writer.close();
-                }
-                else{
-                    FileWriter writer = new FileWriter(file);
-                    writer.write("a");
-                    writer.close();
-                }
             }
             catch(IOException error){
                 System.out.println("There was an error saving the data. Sorry for the inconvinience");
