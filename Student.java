@@ -69,8 +69,18 @@ class Student {
         return grades.size();
     }
     
+    public int getAssignmentSize(){
+        return grades.size();
+    }
+    
     public Assignment getAssignmentToSave(int i){
         return grades.get(i);
     }
+
+    public void setGrades(ArrayList<Assignment> grades) {
+        this.grades = grades;
+    }
+    
+    
     
 }

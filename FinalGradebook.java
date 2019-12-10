@@ -26,7 +26,6 @@ public class FinalGradebook {
         Scanner kb = new Scanner(System.in);
         boolean running = true;
         
-        ArrayList<Assignment> assignments = new ArrayList<Assignment>();
         ArrayList<Student> students = null;
         
         String password = null;
@@ -55,13 +54,53 @@ public class FinalGradebook {
                         passwordSetup = false;
                     }
                 }
-                
-                //password is set, set up list of students
-                System.out.println("Now we will set up your list of students. Please note that you can Add or Remove students later. How many students do you have?");
-                studentCount = kb.nextInt();
-                
-                //Name the students. After this, setup is done.
-                students = nameStudents(studentCount);
+                //check for files in the save folder
+                File temp = new File("H:/Files-to-read/Gradebook-Students");
+                //make sure the selected file is a folder
+                if(temp.isDirectory()){
+                    //test if the foler is empty
+                    if(temp.list().length > 0){
+                        //offer to recall
+                        System.out.println("We see you have past data. Would you like to recall it?");
+                        //teacher confirms
+                        boolean aaa = true;
+                        while(aaa){
+                            if(kb.nextLine().equals("yes")){
+                                students = new ArrayList<Student>();
+                                recall(temp, students);
+                                aaa = false;
+                            }
+                            else{
+                                System.out.println("Are you sure?");
+                                if(kb.nextLine().equals("yes")){
+                                    //empty folder
+                                    for(File file: temp.listFiles()){
+                                        if(!file.isDirectory()){
+                                            file.delete();
+                                        }
+                                    }
+                                    //set up list of students
+                                    System.out.println("Ok. We will set up your list of students. Please note that you can Add or Remove students later. How many students do you have?");
+                                    studentCount = kb.nextInt();
+
+                                    //Name the students. After this, setup is done.
+                                    students = nameStudents(studentCount);
+                                    aaa = false;
+                                }
+                            }
+                        }
+
+                    }
+                    else{
+                        //Teacher doesn't want to recall
+                        //set up list of students
+                        System.out.println("Now we will set up your list of students. Please note that you can Add or Remove students later. How many students do you have?");
+                        studentCount = kb.nextInt();
+
+                        //Name the students. After this, setup is done.
+                        students = nameStudents(studentCount);
+                    }
+                }
             }
             System.out.println("Welcome to Gradebook! Are you a teacher or a student?");
             
@@ -106,7 +145,7 @@ public class FinalGradebook {
                         
                         
                         //THIS MUST BE DONE! COME BACK TO HERE
-                        System.out.println("");
+                        System.out.println("Commands you can use are...");
                         
                         
                     }
@@ -205,9 +244,6 @@ public class FinalGradebook {
                                 temp.setName(name);
                                 temp.setTotal(total);
                             
-                                //add assignment to main list
-                                assignments.add(temp);
-                            
                                 //add assignment to student lists
                                 for(int i = 0; i < students.size(); i++){
                                     //get earned points
@@ -247,14 +283,6 @@ public class FinalGradebook {
                                 for(int i = 0; i < students.size(); i++){
                                     students.get(i).removeAssignment(name);
                                 }
-                                
-                                //remove from list
-                                for(int i = 0; i < assignments.size(); i++){
-                                    if(assignments.get(i).getName().equals(name)){
-                                        assignments.remove(i);
-                                        break;
-                                    }
-                                }
                             }
                             //teacher doesn't say yes
                             else{
@@ -285,7 +313,7 @@ public class FinalGradebook {
                         
                         //print info
                         System.out.println(temp.getName()+" has a "+temp.getGrades()+"% in the class. Their grades are as follows:");
-                        for(int i = 0; i < assignments.size(); i++){
+                        for(int i = 0; i < temp.getAssignmentSize(); i++){
                             System.out.println(temp.getAssignment(i));
                         }
                     }
@@ -303,8 +331,8 @@ public class FinalGradebook {
                     }
                     //quit
                     if(command.equals("quit")){
-                        System.out.println("WARNING: THIS WILL CANCEL THE PROGRAM. If you do not want to cancel the program, you can use the commanf \"log out\"");
-                        System.out.println("Are you sure you want to log out?");
+                        System.out.println("WARNING: THIS WILL CANCEL THE PROGRAM. If you do not want to cancel the program, you can use the command \"log out\"");
+                        System.out.println("Are you sure you want to quit?");
                         if(kb.nextLine().equals("yes")){
                             System.out.println("Quitting...");
                             running = false;
@@ -331,7 +359,7 @@ public class FinalGradebook {
                 for(int i = 0; i < students.size(); i++){
                     if(students.get(i).getName().equals(name)){
                         System.out.println("You have a "+students.get(i).getGrades()+"%, and your grdes are as follows:");
-                        for(int j = 0; j < assignments.size(); j++){
+                        for(int j = 0; j < students.get(i).getAssignmentSize(); j++){
                             System.out.println(students.get(i).getAssignment(j));
                         }
                     }
@@ -372,8 +400,7 @@ public class FinalGradebook {
         for(int i = 0; i < s.size(); i++){
             //looks for file. If there isn't one, it should create it.
             File file = new File("H:/Files-to-read/Gradebook-Students/"+s.get(i).getName().replace(" ", "-")+".txt");
-            
-            int AAAAAAA = 0;
+           
             
             //try and save
             try{
@@ -394,7 +421,7 @@ public class FinalGradebook {
                         writer.write(s.get(i).getAssignmentToSave(e).getName());
                         writer.write(System.lineSeparator());
                         //write earned, then total
-                        writer.write(s.get(i).getAssignmentToSave(e).getEarned()+","+s.get(i).getAssignmentToSave(e).getTotal());
+                        writer.write(s.get(i).getAssignmentToSave(e).getEarned()+"/"+s.get(i).getAssignmentToSave(e).getTotal());
                         writer.write(System.lineSeparator());
                     }
                     //stop
@@ -405,6 +432,59 @@ public class FinalGradebook {
             }
         }
     }
-    
-    
+
+    private static void recall(File folder, ArrayList<Student> students) {
+        //get all files
+        File[] studentFiles = folder.listFiles();
+
+        //read student files
+        for(int j = 0; j < studentFiles.length; j++){
+            File file = studentFiles[j];
+            try{
+                //make a new scanner for the file
+                Scanner input = new Scanner(file);
+
+                //make the arraylist of assignments for later
+                ArrayList<Assignment> assignments = new ArrayList<Assignment>();
+                //get the student's name, which will be on the first line
+                String name = input.nextLine();
+
+                //read the rest of the file
+                boolean aaa = true;
+                while(aaa){
+                    //check to ensure that the file has another line
+                    if(input.hasNext()){
+                        //create assignment
+                        Assignment temp = new Assignment();
+                        //set name
+                        temp.setName(input.nextLine());
+                        //split earned and total
+                        String[] points = input.nextLine().split("/");
+                        //turn earned and total into ints
+                        int earned = Integer.parseInt(points[0]);
+                        int total = Integer.parseInt(points[1]);
+                        //set earned and total
+                        temp.setEarned(earned);
+                        temp.setTotal(total);
+
+                        //add assignment to arrayList
+                        assignments.add(temp);
+                    }
+                    //there is nothing else in the file
+                    else{
+                        aaa = false;
+                    }
+                }
+                //create student
+                Student student = new Student();
+                student.setName(name);
+                student.setGrades(assignments);
+                students.add(student);
+                
+            }
+            catch(IOException error){
+                System.out.println("There was an error recalling the data.");
+            }
+        }
+    }
 }
