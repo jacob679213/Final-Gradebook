@@ -11,10 +11,12 @@ import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
- * @author Some Skyrim Character(Jacob Bitter)
+ * @author Akatosh(Jacob Bitter)
  */
 public class FinalGradebook {
 
@@ -55,9 +57,9 @@ public class FinalGradebook {
                     }
                 }
                 //check for files in the save folder
-                File temp = new File("H:/Files-to-read/Gradebook-Students");
+                File temp = new File("C:/Files-to-read/Gradebook-Students");
                 //make sure the selected file is a folder
-                if(temp.isDirectory()){
+                if(temp.exists()){
                     //test if the foler is empty
                     if(temp.list().length > 0){
                         //offer to recall
@@ -72,6 +74,7 @@ public class FinalGradebook {
                             }
                             else{
                                 System.out.println("Are you sure?");
+                                //Teacher doesn't want to recall
                                 if(kb.nextLine().equals("yes")){
                                     //empty folder
                                     for(File file: temp.listFiles()){
@@ -89,10 +92,8 @@ public class FinalGradebook {
                                 }
                             }
                         }
-
                     }
                     else{
-                        //Teacher doesn't want to recall
                         //set up list of students
                         System.out.println("Now we will set up your list of students. Please note that you can Add or Remove students later. How many students do you have?");
                         studentCount = kb.nextInt();
@@ -100,6 +101,16 @@ public class FinalGradebook {
                         //Name the students. After this, setup is done.
                         students = nameStudents(studentCount);
                     }
+                }
+                else{
+                    temp.mkdir();
+
+                    //set up list of students
+                    System.out.println("Now we will set up your list of students. Please note that you can Add or Remove students later. How many students do you have?");
+                    studentCount = kb.nextInt();
+
+                    //Name the students. After this, setup is done.
+                    students = nameStudents(studentCount);
                 }
             }
             System.out.println("Welcome to Gradebook! Are you a teacher or a student?");
@@ -142,12 +153,28 @@ public class FinalGradebook {
                     
                     //ask for help
                     if(command.equals("help")){
-                        
-                        
-                        //THIS MUST BE DONE! COME BACK TO HERE
-                        System.out.println("Commands you can use are...");
-                        
-                        
+                        //Tell the teacher commands :P
+                        System.out.println("Commands you can use are...\n");
+                        //list grades-              
+                        System.out.println("list grades \t\tLists all students grades");
+                        //add student-              
+                        System.out.println("add student \t\tAdds a student");
+                        //remove student            
+                        System.out.println("remove student \t\tRemoves a student");
+                        //add assignment            
+                        System.out.println("add assignment \t\tCreatee a new assignment");
+                        //remove assignment         
+                        System.out.println("remove assignment \tRemove an assignment from all students");
+                        //see individual grade      
+                        System.out.println("see grade \t\tSee an individual student's grade");
+                        //log out                   
+                        System.out.println("log out \t\tLog out of the program, allowing students to log in");
+                        //quit                      
+                        System.out.println("quit \t\t\tQuit the progrram, closing it in the process");
+                        //save                      
+                        System.out.println("save \t\t\tSave the data for later");
+                        //uninstall                 
+                        System.out.println("uninstall \t\tUninstall saved data");
                     }
                     
                     //list students and grades
@@ -317,35 +344,71 @@ public class FinalGradebook {
                             System.out.println(temp.getAssignment(i));
                         }
                     }
+                    
                     //log out
                     if(command.equals("log out")){
+                        //confirm
                         System.out.println("Just to confirm, you want to log out?");
+                        //teacher says yes
                         if(kb.nextLine().equals("yes")){
+                            //log out
                             System.out.println("Logging out");
                             locked = true;
                             loggedIn = false;
                         }
+                        //teacher says no
                         else{
                             System.out.println("Okay. We won't log you out.");
                         }
                     }
+                    
                     //quit
                     if(command.equals("quit")){
+                        //warn and confirm
                         System.out.println("WARNING: THIS WILL CANCEL THE PROGRAM. If you do not want to cancel the program, you can use the command \"log out\"");
                         System.out.println("Are you sure you want to quit?");
+                        //teacher says yes
                         if(kb.nextLine().equals("yes")){
+                            //quit
                             System.out.println("Quitting...");
                             running = false;
                             loggedIn = false;
                         }
+                        //teacher says no
                         else{
                             System.out.println("Okay. The program will not quit.");
                         }
                         
                     }
+                    
                     //save
                     if(command.equals("save")){
                         save(students);
+                    }
+                    
+                    //clear folder
+                    if(command.equals("uninstall")){
+                        //confirm
+                        System.out.println("You would like to delete the folder created while saving data?");
+                        //teacher says yes
+                        if(kb.nextLine().equals("yes")){
+                            //locate directory
+                            File folder = new File("C:/Files-to-read/Gradebook-Students");
+                            
+                            //confirm directory is a directory
+                            if(folder.isDirectory()){
+                                //clear directory
+                                for(File file : folder.listFiles()){
+                                    file.delete();
+                                }
+                                //delete the cleared directoy
+                                if(folder.listFiles().length == 0){
+                                    folder.delete();
+                                }
+                            }
+                            
+                            System.out.println("Text Files Deleted.");
+                        }
                     }
                     //next command
                 }
@@ -353,11 +416,16 @@ public class FinalGradebook {
             
             //log in as student
             if(kb.nextLine().equals("student")){
+                //get name
                 System.out.println("What is your name?");
                 String name = kb.nextLine();
                 
-                for(int i = 0; i < students.size(); i++){
-                    if(students.get(i).getName().equals(name)){
+                //take name and look for student with matching name
+                for(int i = 0; i <= students.size(); i++){
+                    if(i == students.size()){
+                        System.out.println("Sorry, but we couldn't seem to find you. Make sure you check the name for typos.");
+                    }
+                    else if(students.get(i).getName().equals(name)){
                         System.out.println("You have a "+students.get(i).getGrades()+"%, and your grdes are as follows:");
                         for(int j = 0; j < students.get(i).getAssignmentSize(); j++){
                             System.out.println(students.get(i).getAssignment(j));
@@ -399,7 +467,7 @@ public class FinalGradebook {
     public static void save(ArrayList<Student> s){
         for(int i = 0; i < s.size(); i++){
             //looks for file. If there isn't one, it should create it.
-            File file = new File("H:/Files-to-read/Gradebook-Students/"+s.get(i).getName().replace(" ", "-")+".txt");
+            File file = new File("C:/Files-to-read/Gradebook-Students/"+s.get(i).getName().replace(" ", "-")+".txt");
            
             
             //try and save
@@ -426,6 +494,7 @@ public class FinalGradebook {
                     }
                     //stop
                     writer.close();
+                    System.out.println("Saved");
             }
             catch(IOException error){
                 System.out.println("There was an error saving the data. Sorry for the inconvinience");
