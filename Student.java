@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 /**
  *
- * @author 679213
+ * @author Akatosh(Jacob Bitter)
  */
 class Student {
     String name;

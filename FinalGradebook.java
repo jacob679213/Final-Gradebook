@@ -57,7 +57,7 @@ public class FinalGradebook {
                     }
                 }
                 //check for files in the save folder
-                File temp = new File("C:/Files-to-read/Gradebook-Students");
+                File temp = new File("H:/Files-to-read/Gradebook-Students");
                 //make sure the selected file is a folder
                 if(temp.exists()){
                     //test if the foler is empty
@@ -393,7 +393,7 @@ public class FinalGradebook {
                         //teacher says yes
                         if(kb.nextLine().equals("yes")){
                             //locate directory
-                            File folder = new File("C:/Files-to-read/Gradebook-Students");
+                            File folder = new File("H:/Files-to-read/Gradebook-Students");
                             
                             //confirm directory is a directory
                             if(folder.isDirectory()){
@@ -464,10 +464,11 @@ public class FinalGradebook {
         
     }
     
+    //method to save data to text files
     public static void save(ArrayList<Student> s){
         for(int i = 0; i < s.size(); i++){
             //looks for file. If there isn't one, it should create it.
-            File file = new File("C:/Files-to-read/Gradebook-Students/"+s.get(i).getName().replace(" ", "-")+".txt");
+            File file = new File("H:/Files-to-read/Gradebook-Students/"+s.get(i).getName().replace(" ", "-")+".txt");
            
             
             //try and save

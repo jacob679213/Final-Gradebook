@@ -7,7 +7,7 @@ package finalgradebook;
 
 /**
  *
- * @author 679213
+ * @author Akatosh(Jacob Bitter)
  */
 class Assignment {
     
